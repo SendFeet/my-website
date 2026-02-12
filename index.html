@@ -123,7 +123,8 @@
     }
 
     function formatText(text) {
-        const lines = text.split("\n");
+        const lines = text.split("
+");
         content.innerHTML = "";
 
         lines.forEach(line => {
@@ -137,6 +138,11 @@
 
             div.textContent = line;
             content.appendChild(div);
+
+            // Add intentional blank line after each scripture line
+            let spacer = document.createElement("div");
+            spacer.innerHTML = "&nbsp;";
+            content.appendChild(spacer);
         });
 
         const cursor = document.createElement("span");
