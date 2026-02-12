@@ -30,21 +30,36 @@
     #viewport::-webkit-scrollbar{ width:0px; }
 
     #content{
-      max-width:700px;
+      max-width:780px;
       width:100%;
       display:flex;
       flex-direction:column;
+      font-size:17px;
+      letter-spacing:0.01em;
+      text-rendering:optimizeLegibility;
+      -webkit-font-smoothing:antialiased;
+      font-kerning:normal;
     }
 
     .line{
       white-space:pre-wrap;
-      line-height:1.8em;
-      text-align:center;
+      line-height:1.95em;
+      text-align:left; /* left justify normal scripture */
+      hyphens:auto;
+    }
+
+    /* Book-like indentation (disabled for headers and first line after a header) */
+    .line.prose{
+      text-indent:1.6em;
+    }
+
+    .line.noindent{
+      text-indent:0;
     }
 
     /* true blank line between verses */
     .spacer{
-      height:1.8em;
+      height:1.2em; /* subtle blank line */
     }
 
     .title { 
@@ -52,6 +67,7 @@
       font-weight:700; 
       font-size:1.2em; 
       margin-bottom:1em;
+      text-align:center; /* keep main title centered */
     }
 
     .chapter { 
@@ -59,6 +75,7 @@
       font-weight:700; 
       margin-top:2em;
       margin-bottom:1em;
+      text-align:center; /* keep chapter headers centered */
     }
 
     .cursor{
@@ -123,8 +140,21 @@
 
         content.innerHTML = "";
 
+        let prevWasHeader = true;
+
         for (const line of lines) {
-          addLine(line, classify(line));
+          const cls = classify(line);
+
+          if (cls === "title" || cls === "chapter") {
+            addLine(line, cls);
+            prevWasHeader = true;
+          } else {
+            // Normal prose line: indent, except right after a header
+            const proseClass = prevWasHeader ? "noindent" : "prose";
+            addLine(line, proseClass);
+            prevWasHeader = false;
+          }
+
           addSpacer();
         }
 
