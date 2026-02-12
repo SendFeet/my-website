@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story of Enoch</title>
+
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        font-family: "Courier New", monospace;
+        overflow: hidden;
+    }
+
+    .editor {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    .line-numbers {
+        background-color: #252526;
+        color: #858585;
+        text-align: right;
+        user-select: none;
+        overflow-y: scroll;
+        padding: 20px 10px;
+        box-sizing: border-box;
+        min-width: 60px;
+    }
+
+    .line-numbers span {
+        display: block;
+        padding: 0 10px;
+    }
+
+    .content {
+        flex: 1;
+        padding: 20px;
+        white-space: pre-wrap;
+        overflow-y: scroll;
+        box-sizing: border-box;
+        scroll-behavior: smooth;
+        font-size: 16px;
+        line-height: 1.6em;
+    }
+
+    .content::-webkit-scrollbar,
+    .line-numbers::-webkit-scrollbar {
+        width: 0px;
+    }
+
+    .chapter {
+        color: #569cd6;
+        font-weight: bold;
+    }
+
+    .title {
+        color: #4ec9b0;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .cursor {
+        display: inline-block;
+        width: 8px;
+        background-color: #d4d4d4;
+        margin-left: 4px;
+        animation: blink 1s infinite;
+        height: 1em;
+        vertical-align: bottom;
+    }
+
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .line-numbers {
+            min-width: 40px;
+            padding: 15px 5px;
+        }
+        .content {
+            padding: 15px;
+            font-size: 14px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="editor">
+    <div class="line-numbers" id="lineNumbers"></div>
+    <div class="content" id="codeContent"></div>
+</div>
+
+<script>
+    const content = document.getElementById("codeContent");
+    const lineNumbers = document.getElementById("lineNumbers");
+
+    async function loadText() {
+        try {
+            const response = await fetch("Story of Enoch.txt");
+            const text = await response.text();
+            formatText(text);
+        } catch (error) {
+            content.innerHTML = "Error loading text file.<span class='cursor'></span>";
+        }
+    }
+
+    function formatText(text) {
+        const lines = text.split("\n");
+        content.innerHTML = "";
+
+        lines.forEach(line => {
+            let div = document.createElement("div");
+
+            if (line.toLowerCase().includes("chapter")) {
+                div.className = "chapter";
+            } else if (line.toLowerCase().includes("story of enoch")) {
+                div.className = "title";
+            }
+
+            div.textContent = line;
+            content.appendChild(div);
+        });
+
+        const cursor = document.createElement("span");
+        cursor.className = "cursor";
+        content.appendChild(cursor);
+
+        generateLineNumbers();
+    }
+
+    function generateLineNumbers() {
+        const lines = content.children.length;
+        lineNumbers.innerHTML = "";
+        for (let i = 1; i <= lines; i++) {
+            const span = document.createElement("span");
+            span.textContent = i;
+            span.style.lineHeight = getComputedStyle(content).lineHeight;
+            lineNumbers.appendChild(span);
+        }
+    }
+
+    content.addEventListener("scroll", () => {
+        lineNumbers.scrollTop = content.scrollTop;
+    });
+
+    window.addEventListener("resize", generateLineNumbers);
+
+    loadText();
+</script>
+
+</body>
+</html>
